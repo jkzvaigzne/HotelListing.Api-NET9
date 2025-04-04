@@ -37,19 +37,45 @@ public class HotelsController : ControllerBase
 
     // POST api/<HotelsController>
     [HttpPost]
-    public void Post([FromBody]string value)
+    public ActionResult<Hotel> Post([FromBody] Hotel newHotel)
     {
+        if (hotels.Any(h => h.Id == newHotel.Id)) 
+        {
+            return BadRequest($"Hotel with this {newHotel.Id} already exists.");
+        }
+
+        hotels.Add(newHotel);
+        return CreatedAtAction(nameof(Get), new { id = newHotel.Id }, newHotel);
     }
 
     // PUT api/<HotelsController>/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody]string value)
+    public ActionResult Put(int id, [FromBody]Hotel updatedHotel)
     {
+        var existingHotel = hotels.FirstOrDefault(h => h.Id == id);
+        if(existingHotel == null)
+        {
+            return NotFound();
+        }
+
+        existingHotel.Name = updatedHotel.Name;
+        existingHotel.Address = updatedHotel.Address;
+        existingHotel.Rating = updatedHotel.Rating;
+
+        return NoContent();
     }
 
     // DELETE api/<HotelsController>/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public ActionResult Delete(int id)
     {
+        var hotel = hotels.FirstOrDefault(h => h.Id == id);
+        if (hotel == null)
+        {
+            return NotFound(new { message = "Hotel not found."});
+        }
+
+        hotels.Remove(hotel);
+        return NoContent();
     }
 }
