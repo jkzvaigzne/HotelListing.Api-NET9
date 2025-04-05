@@ -1,4 +1,6 @@
-﻿namespace HotelListing.Api.Data;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HotelListing.Api.Data;
 
 public class Hotel
 {
@@ -7,6 +9,7 @@ public class Hotel
     public string Address { get; set; }
     public double Rating { get; set; }
 
+    [ForeignKey(nameof(CountryId))]
     public int CountryId { get; set; }
     public Country? Country { get; set; }
 }
