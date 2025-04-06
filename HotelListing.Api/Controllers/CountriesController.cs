@@ -19,7 +19,9 @@ namespace HotelListing.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
         {
-            return await _context.Countries.ToListAsync();
+            var countries = await _context.Countries.ToListAsync();
+
+            return Ok(countries);
         }
 
         // GET: api/Countries/5
@@ -33,17 +35,16 @@ namespace HotelListing.Api.Controllers
                 return NotFound();
             }
 
-            return country;
+            return Ok(country);
         }
 
-        // PUT: api/Countries/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Countries/5 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(int id, Country country)
         {
             if (id != country.CountryId)
             {
-                return BadRequest();
+                return BadRequest($"Invalid Record {id}");
             }
 
             _context.Entry(country).State = EntityState.Modified;
@@ -68,7 +69,6 @@ namespace HotelListing.Api.Controllers
         }
 
         // POST: api/Countries
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Country>> PostCountry(Country country)
         {
