@@ -1,3 +1,4 @@
+using HotelListing.Api.Configurations;
 using HotelListing.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +12,12 @@ builder.Services.AddDbContext<HotelListingDbContext>(
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
 builder.Services.AddSwaggerGen();
+// AutoMapper Config
+builder.Services.AddAutoMapper(typeof(MapperConfig));
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
