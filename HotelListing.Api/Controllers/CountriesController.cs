@@ -48,14 +48,21 @@ namespace HotelListing.Api.Controllers
 
         // PUT: api/Countries/5 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountry(int id, Country country)
+        public async Task<IActionResult> PutCountry(int id, UpdateCountryDto updateCountryDto)
         {
-            if (id != country.CountryId)
+            if (id != updateCountryDto.Id)
             {
                 return BadRequest($"Invalid Record {id}");
             }
 
-            _context.Entry(country).State = EntityState.Modified;
+            var country = await _context.Countries.FindAsync(id);
+
+            if (country == null)
+            {
+                return NotFound();
+            }
+
+            _mapper.Map(updateCountryDto, country);
 
             try
             {
