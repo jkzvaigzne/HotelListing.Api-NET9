@@ -1,5 +1,7 @@
 using HotelListing.Api.Configurations;
+using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
+using HotelListing.Api.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 // AutoMapper Config
 builder.Services.AddAutoMapper(typeof(MapperConfig));
+// Register Generic Repository
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// Register Specific Countries Repository
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 
 var app = builder.Build();
 
