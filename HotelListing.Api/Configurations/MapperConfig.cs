@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelListing.Api.Data;
 using HotelListing.Api.Models.Country;
+using HotelListing.Api.Models.Hotels;
 
 namespace HotelListing.Api.Configurations
 {
@@ -9,6 +10,9 @@ namespace HotelListing.Api.Configurations
         public MapperConfig()
         {
             CreateMap<Country, CreateCountryDto>().ReverseMap();
+            CreateMap<Country, GetCountryDto>().ReverseMap();
+            CreateMap<Country, CountryDto>().ReverseMap();
+            CreateMap<Hotel, HotelDto>().ReverseMap();
         }
     }
 }
