@@ -91,7 +91,7 @@ namespace HotelListing.Api.Controllers
 
             await _countriesRepository.AddAsync(country);
 
-            return CreatedAtAction("GetCountry", new { id = country.CountryId }, country);
+            return CreatedAtAction("GetCountry", new { id = country.Id }, country);
         }
 
         // DELETE: api/Countries/5

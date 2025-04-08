@@ -17,7 +17,7 @@ namespace HotelListing.Api.Repository
         {
             return await _context.Countries
                 .Include(q => q.Hotels)
-                .FirstOrDefaultAsync(q => q.CountryId == id);
+                .FirstOrDefaultAsync(q => q.Id == id);
         }
     }
 }
