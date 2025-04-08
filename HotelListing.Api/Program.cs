@@ -19,8 +19,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 // Register Generic Repository
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-// Register Specific Countries Repository
+// Register Specific Countries & Hotels Repository
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
 
 var app = builder.Build();
 
