@@ -28,6 +28,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 // Register Specific Countries & Hotels Repository
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
+// Register AuthManager
+builder.Services.AddScoped<IAuthManager, AuthManager>();
 
 var app = builder.Build();
 
