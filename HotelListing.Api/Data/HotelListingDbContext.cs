@@ -12,5 +12,11 @@ namespace HotelListing.Api.Data
 
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
+        }
     }
 }
