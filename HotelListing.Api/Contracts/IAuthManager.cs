@@ -1,6 +1,5 @@
 ﻿using HotelListing.Api.Models.Users;
 using Microsoft.AspNetCore.Identity;
-using System.Collections;
 
 namespace HotelListing.Api.Contracts
 {
@@ -8,5 +7,7 @@ namespace HotelListing.Api.Contracts
     {
         Task<IEnumerable<IdentityError>> Register(ApiUserDto userDto);
         Task<AuthResponseDto> Login(LoginDto loginDto);
+        Task<string> CreateRefreshToken();
+        Task<AuthResponseDto> VerifyRefreshToken(AuthResponseDto request);
     }
 }
