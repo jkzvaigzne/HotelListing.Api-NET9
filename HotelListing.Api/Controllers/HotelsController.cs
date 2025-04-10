@@ -4,6 +4,7 @@ using HotelListing.Api.Data;
 using HotelListing.Api.Contracts;
 using AutoMapper;
 using HotelListing.Api.Models.Hotels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListing.Api.Controllers
 {
@@ -48,6 +49,7 @@ namespace HotelListing.Api.Controllers
         // PUT: api/Hotels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PutHotel(int id, HotelDto hotelDto)
         {
             if (id != hotelDto.Id)
@@ -85,6 +87,7 @@ namespace HotelListing.Api.Controllers
         // POST: api/Hotels
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<Hotel>> PostHotel(CreateHotelDto hotelDto)
         {
             var hotel = _mapper.Map<Hotel>(hotelDto);
