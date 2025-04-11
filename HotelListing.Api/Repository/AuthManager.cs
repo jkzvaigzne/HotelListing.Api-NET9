@@ -15,16 +15,18 @@ namespace HotelListing.Api.Repository
         private readonly IMapper _mapper;
         private readonly UserManager<ApiUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
         private ApiUser _user;
         // Just for reduce magic strings
         private const string _loginProvider = "HotelListingApi";
         private const string _refreshToken = "RefreshToken";
 
-        public AuthManager(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration)
+        public AuthManager(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration, ILogger<AuthManager> logger)
         {
             this._mapper = mapper;
             this._userManager = userManager;
             this._configuration = configuration;
+            this._logger = logger;
         }
 
         public async Task<string> CreateRefreshToken()
@@ -38,15 +40,17 @@ namespace HotelListing.Api.Repository
 
         public async Task<AuthResponseDto> Login(LoginDto loginDto)
         {
+            _logger.LogInformation($"Looking for user with email - {loginDto.Email}.");
             _user = await _userManager.FindByEmailAsync(loginDto.Email);
             bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
 
             if(_user == null || isValidUser == false)
             {
+                _logger.LogWarning($"Login failed for user with email - {loginDto.Email}.");
                 return null;
             }
-
             var token = await GenerateToken();
+            _logger.LogInformation($"Token generated successfully with {loginDto.Email} | Token {token}");
             return new AuthResponseDto
             {
                 Token = token,
@@ -57,6 +61,7 @@ namespace HotelListing.Api.Repository
 
         public async Task<IEnumerable<IdentityError>> Register(ApiUserDto userDto)
         {
+            _logger.LogInformation($"Registration Attempt for - {userDto.Email}.");
             _user = _mapper.Map<ApiUser>(userDto);
             _user.UserName = userDto.Email;
 
@@ -64,6 +69,7 @@ namespace HotelListing.Api.Repository
 
             if (result.Succeeded)
             {
+                _logger.LogInformation($"User created successfully - {userDto.Email}.");
                 await _userManager.AddToRoleAsync(_user, "User");
             }
 
