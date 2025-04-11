@@ -1,6 +1,4 @@
 ﻿using HotelListing.Api.Exceptions;
-using HotelListing.Api.Models.Users;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Newtonsoft.Json;
 using System.Net;
 
@@ -54,11 +52,5 @@ namespace HotelListing.Api.Middleware
             context.Response.StatusCode = (int)statusCode;
             return context.Response.WriteAsync(response);
         }
-    }
-
-    public class ErrorDetails
-    {
-        public string ErrorType { get; set; }
-        public string ErrorMessage { get; set; }
     }
 }
