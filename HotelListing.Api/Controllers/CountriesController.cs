@@ -16,7 +16,7 @@ namespace HotelListing.Api.Controllers
         private readonly ICountriesRepository _countriesRepository;
         private readonly ILogger _logger;
 
-        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger logger)
+        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger)
         {
             this._mapper = mapper;
             this._countriesRepository = countriesRepository;
