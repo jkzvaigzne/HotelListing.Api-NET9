@@ -11,6 +11,7 @@ namespace HotelListing.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class CountriesController : ControllerBase
     {
         private readonly IMapper _mapper;
