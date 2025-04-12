@@ -5,6 +5,7 @@ using HotelListing.Api.Contracts;
 using AutoMapper;
 using HotelListing.Api.Models.Hotels;
 using Microsoft.AspNetCore.Authorization;
+using HotelListing.Api.Exceptions;
 
 namespace HotelListing.Api.Controllers
 {
@@ -54,7 +55,7 @@ namespace HotelListing.Api.Controllers
         {
             if (id != hotelDto.Id)
             {
-                return BadRequest();
+                throw new BadRequestException(nameof(PutHotel), id);
             }
 
             var hotel = await _hotelsRepository.GetAsync(id);
