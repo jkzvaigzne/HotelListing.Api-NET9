@@ -6,6 +6,7 @@ using HotelListing.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -25,7 +26,6 @@ builder.Services.AddIdentityCore<ApiUser>()
     .AddTokenProvider<DataProtectorTokenProvider<ApiUser>>("HotelListingApi")
     .AddEntityFrameworkStores<HotelListingDbContext>().AddDefaultTokenProviders();
 
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
@@ -80,6 +80,12 @@ builder.Services.AddResponseCaching(options =>
     options.MaximumBodySize = 1024;
     options.UseCaseSensitivePaths = true;
 });
+// Add Controllers
+builder.Services.AddControllers().AddOData(options =>
+{
+    options.Select().Filter().OrderBy();
+});
+
 
 var app = builder.Build();
 
