@@ -246,8 +246,6 @@ class CustomHealthCheck : IHealthCheck
     {
         var isHealthy = true;
 
-        /*custom checks. Logic...etc.etc.*/
-
         if(isHealthy)
         {
             return Task.FromResult(HealthCheckResult.Healthy("All system are looking good."));
