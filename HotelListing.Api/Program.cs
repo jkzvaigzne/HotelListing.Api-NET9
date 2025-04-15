@@ -4,14 +4,17 @@ using HotelListing.Api.Data;
 using HotelListing.Api.Middleware;
 using HotelListing.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 // Register Serilog
@@ -113,6 +116,15 @@ builder.Services.AddResponseCaching(options =>
     options.MaximumBodySize = 1024;
     options.UseCaseSensitivePaths = true;
 });
+
+builder.Services.AddHealthChecks()
+    .AddCheck<CustomHealthCheck>("Custom Health Check",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "custom" })
+    .AddSqlServer(connectionString, tags: new[] {"database"})
+    .AddDbContextCheck<HotelListingDbContext>(tags: new[] {"database"});
+
+
 // Add Controllers
 builder.Services.AddControllers().AddOData(options =>
 {
@@ -128,6 +140,78 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = health => health.Tags.Contains("custom"),
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+    },
+    ResponseWriter = WriteResponse 
+});
+
+app.MapHealthChecks("/databasehealth", new HealthCheckOptions
+{
+    Predicate = health => health.Tags.Contains("database"),
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+    },
+    ResponseWriter = WriteResponse
+});
+
+app.MapHealthChecks("/mainhealth", new HealthCheckOptions
+{
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+    },
+    ResponseWriter = WriteResponse
+});
+
+static Task WriteResponse(HttpContext context, HealthReport report)
+{
+    context.Response.ContentType = "application/json; charset=utf-8";
+
+    var options = new JsonWriterOptions { Indented = true };
+
+    using var memoryStream = new MemoryStream();
+    using (var jsonWriter = new Utf8JsonWriter(memoryStream, options))
+    {
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("status", report.Status.ToString());
+
+        jsonWriter.WriteStartObject("results");
+        foreach (var healthReportEntry in report.Entries)
+        {
+            jsonWriter.WriteStartObject(healthReportEntry.Key);
+            jsonWriter.WriteString("status", healthReportEntry.Value.Status.ToString());
+            jsonWriter.WriteString("description", healthReportEntry.Value.Description ?? string.Empty);
+
+            jsonWriter.WriteStartObject("data");
+            foreach (var item in healthReportEntry.Value.Data)
+            {
+                jsonWriter.WritePropertyName(item.Key);
+                JsonSerializer.Serialize(jsonWriter, item.Value,
+                    item.Value?.GetType() ?? typeof(object));
+            }
+            jsonWriter.WriteEndObject(); 
+            jsonWriter.WriteEndObject(); 
+        }
+        jsonWriter.WriteEndObject(); 
+        jsonWriter.WriteEndObject(); 
+    }
+
+    return context.Response.WriteAsync(
+        Encoding.UTF8.GetString(memoryStream.ToArray()));
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
@@ -155,3 +239,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+class CustomHealthCheck : IHealthCheck
+{
+    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    {
+        var isHealthy = true;
+
+        /*custom checks. Logic...etc.etc.*/
+
+        if(isHealthy)
+        {
+            return Task.FromResult(HealthCheckResult.Healthy("All system are looking good."));
+        }
+
+        return Task.FromResult(new HealthCheckResult(context.Registration.FailureStatus, "System Unhealthy"));
+    }
+}
